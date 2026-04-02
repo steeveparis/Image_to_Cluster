@@ -78,6 +78,121 @@ Difficulté : Facile (~30 minutes)
 ---------------------------------------------------
 **Complétez et documentez ce fichier README.md** pour nous expliquer comment utiliser votre solution.  
 Faites preuve de pédagogie et soyez clair dans vos expliquations et processus de travail.  
+
+Rapport d'Atelier : From Image to Cluster
+Objectif du projet
+
+L'objectif de cet atelier était d’automatiser la création d’une image applicative personnalisée et son déploiement sur un cluster Kubernetes (K3d) en utilisant une approche Infrastructure as Code avec Packer et Ansible. Le but était de construire une image Nginx contenant un fichier index.html, puis de la déployer automatiquement dans Kubernetes.
+
+Stack Technique
+
+Environnement : GitHub Codespaces (Ubuntu)
+Orchestrateur : K3d (Kubernetes léger)
+Build Image : Packer (plugin Docker)
+Automatisation : Ansible
+Serveur Web : Nginx customisé
+
+Pré-requis
+
+Avant de commencer, installation des dépendances nécessaires :
+
+Bash :
+pip3 install kubernetes
+ansible-galaxy collection install kubernetes.core
+
+Déploiement de la solution
+
+Le déploiement se fait en plusieurs étapes.
+
+Création du cluster Kubernetes :
+
+Bash :
+k3d cluster create mycluster -p "30080:30080@loadbalancer"
+
+Build de l’image
+
+J’ai utilisé Packer pour créer une image Docker personnalisée à partir de Nginx en y intégrant le fichier index.html.
+
+Bash :
+cd packer
+packer init .
+packer build .
+cd ..
+
+Cette étape génère une image appelée custom-nginx:v1, prête à être utilisée sans configuration supplémentaire.
+
+Import de l’image dans K3d
+
+L’image doit être importée dans le cluster pour que Kubernetes puisse l’utiliser.
+
+Bash :
+k3d image import custom-nginx:v1 -c mycluster
+
+Sans cette étape, les pods ne peuvent pas démarrer car Kubernetes ne trouve pas l’image.
+
+Déploiement avec Ansible
+
+Le déploiement est automatisé avec Ansible, ce qui évite de lancer les commandes Kubernetes manuellement.
+
+Bash :
+cd ansible
+ansible-playbook -i inventory.ini deploy.yml
+cd ..
+
+Le playbook crée :
+
+un Deployment pour lancer le conteneur
+un Service pour exposer l’application
+Vérification du fonctionnement
+
+Une fois le déploiement terminé, vérification des ressources Kubernetes :
+
+Bash :
+kubectl get pods
+kubectl get svc
+kubectl get deployment
+
+Les pods doivent être en état Running.
+
+Accès à l’application
+
+Dans GitHub Codespaces, l’accès se fait via un port-forward :
+
+Bash :
+kubectl port-forward svc/nginx-custom-service 8081:80
+
+Puis ouvrir dans le navigateur :
+http://localhost:8081
+
+La page index.html s’affiche correctement.
+
+Structure des fichiers
+
+Le projet est organisé de la manière suivante :
+
+packer : contient la configuration de build de l’image
+ansible : contient le playbook et les templates Kubernetes
+index.html : page web déployée
+Explication technique
+
+Packer permet de créer une image immuable contenant directement l’application, ce qui garantit un déploiement identique à chaque fois.
+
+Ansible permet d’automatiser le déploiement et d’assurer un état stable du cluster. Le playbook peut être relancé sans provoquer d’erreurs, ce qui correspond au principe d’idempotence.
+
+Kubernetes (K3d) permet d’orchestrer l’exécution de l’application via des pods et de l’exposer via un service.
+
+Cycle de vie DevOps
+
+Le projet suit le cycle :
+
+Build → Deploy → Run
+
+Build : création de l’image avec Packer
+Deploy : déploiement avec Ansible
+Run : exécution dans Kubernetes
+Conclusion
+
+Ce projet m’a permis de comprendre comment automatiser un déploiement complet, de la création d’une image Docker jusqu’à son exécution dans un cluster Kubernetes, en combinant plusieurs outils DevOps dans un pipeline cohérent.
    
 ---------------------------------------------------
 Evaluation
