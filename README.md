@@ -193,7 +193,8 @@ Run : exécution dans Kubernetes
 Conclusion
 
 Ce projet m’a permis de comprendre comment automatiser un déploiement complet, de la création d’une image Docker jusqu’à son exécution dans un cluster Kubernetes, en combinant plusieurs outils DevOps dans un pipeline cohérent.
-   
+
+La mise en place d'un makefile et d'un script m'a permis d'automatiser la mise en place.
 ---------------------------------------------------
 Evaluation
 ---------------------------------------------------
