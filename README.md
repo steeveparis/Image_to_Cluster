@@ -159,10 +159,10 @@ Accès à l’application
 Dans GitHub Codespaces, l’accès se fait via un port-forward :
 
 Bash :
-kubectl port-forward svc/nginx-custom-service 8081:80
+kubectl port-forward svc/nginx-custom-service 30080:80
 
 Puis ouvrir dans le navigateur :
-http://localhost:8081
+http://localhost:30080
 
 La page index.html s’affiche correctement.
 
