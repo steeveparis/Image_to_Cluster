@@ -1,0 +1,37 @@
+---
+- name: Déployer nginx custom sur K3d
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Créer le manifest Deployment
+      template:
+        src: templates/deployment.yml.j2
+        dest: /tmp/deployment.yml
+
+    - name: Créer le manifest Service
+      template:
+        src: templates/service.yml.j2
+        dest: /tmp/service.yml
+
+    - name: Appliquer le Deployment
+      command: kubectl apply -f /tmp/deployment.yml
+
+    - name: Appliquer le Service
+      command: kubectl apply -f /tmp/service.yml
+
+    - name: Vérifier les pods
+      command: kubectl get pods -o wide
+      register: pods_output
+
+    - name: Afficher les pods
+      debug:
+        var: pods_output.stdout_lines
+
+    - name: Vérifier les services
+      command: kubectl get svc
+      register: svc_output
+
+    - name: Afficher les services
+      debug:
+        var: svc_output.stdout_lines
